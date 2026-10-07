@@ -58,6 +58,24 @@ export const waAccounts = pgTable(
   ],
 );
 
+export const clientUsers = pgTable(
+  'client_users',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    tenantId: uuid('tenant_id')
+      .notNull()
+      .references(() => tenants.id, { onDelete: 'cascade' }),
+    email: text('email'),
+    phone: text('phone'),
+    passwordHash: text('password_hash').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex('client_users_email_idx').on(table.email),
+    uniqueIndex('client_users_phone_idx').on(table.phone),
+  ],
+);
+
 export const messageLogs = pgTable(
   'message_logs',
   {
@@ -87,4 +105,5 @@ export const messageLogs = pgTable(
 export type Tenant = typeof tenants.$inferSelect;
 export type ApiKey = typeof apiKeys.$inferSelect;
 export type WaAccount = typeof waAccounts.$inferSelect;
+export type ClientUser = typeof clientUsers.$inferSelect;
 export type MessageLog = typeof messageLogs.$inferSelect;

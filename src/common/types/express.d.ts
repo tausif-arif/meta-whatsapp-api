@@ -7,6 +7,10 @@ declare global {
       rawBody?: Buffer;
       /** API key used to authenticate the request. */
       apiKey?: string;
+      /** Client user id from a dashboard session JWT. */
+      clientUserId?: string;
+      /** Tenant id injected by authentication (API key or session). */
+      tenantId?: string;
     }
   }
 }

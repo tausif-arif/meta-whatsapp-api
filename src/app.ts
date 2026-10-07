@@ -5,8 +5,9 @@ import helmet from 'helmet';
 import { pinoHttp } from 'pino-http';
 import { env } from './config/env.js';
 import { logger } from './config/logger.js';
-import { authenticate } from './common/middleware/auth.middleware.js';
+import { authenticate, requireClient } from './common/middleware/auth.middleware.js';
 import { errorHandler, notFoundHandler } from './common/middleware/error.middleware.js';
+import { authRouter, clientRouter } from './modules/clients/index.js';
 import { contactRouter } from './modules/contacts/contact.route.js';
 import { healthController } from './modules/health/health.controller.js';
 import { healthRouter } from './modules/health/health.route.js';
@@ -47,6 +48,10 @@ export const createApp = () => {
   app.use('/health', healthRouter);
   app.use('/api/v1/health', healthRouter);
   app.use('/api/v1/webhooks', webhookRouter);
+  app.use('/api/v1/auth', authRouter);
+
+  // Client dashboard routes (bearer JWT session)
+  app.use('/api/v1/clients/me', requireClient, clientRouter);
 
   // Authenticated routes (X-API-Key)
   app.use('/api/v1', authenticate);

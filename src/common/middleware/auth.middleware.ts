@@ -6,6 +6,7 @@ import { apiKeys, waAccounts } from '../../db/schema.js';
 import { logger } from '../../config/logger.js';
 import { ApiError } from '../utils/ApiError.js';
 import { decrypt, hashApiKey } from '../utils/crypto.js';
+import { verifyClientToken } from '../utils/jwt.js';
 
 const CACHE_TTL_MS = 60_000;
 
@@ -105,6 +106,23 @@ export const authenticate: RequestHandler = async (req, _res, next) => {
       { tenantId: entry.tenantId, apiKeyId: entry.apiKeyId, waAccount: entry.waAccount },
       () => next(),
     );
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const requireClient: RequestHandler = async (req, _res, next) => {
+  try {
+    const header = req.header('authorization');
+    if (!header?.toLowerCase().startsWith('bearer ')) {
+      throw ApiError.unauthorized('Missing bearer token. Sign in via POST /api/v1/auth/login');
+    }
+
+    const { sub, tenantId } = verifyClientToken(header.slice(7).trim());
+    req.clientUserId = sub;
+    req.tenantId = tenantId;
+
+    runWithContext({ tenantId, clientUserId: sub }, () => next());
   } catch (error) {
     next(error);
   }

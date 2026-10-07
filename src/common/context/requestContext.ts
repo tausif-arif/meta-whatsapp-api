@@ -11,6 +11,7 @@ export interface WaAccountContext {
 export interface RequestContext {
   tenantId: string;
   apiKeyId?: string;
+  clientUserId?: string;
   waAccount?: WaAccountContext | null;
 }
 

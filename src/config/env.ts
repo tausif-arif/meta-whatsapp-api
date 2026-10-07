@@ -17,7 +17,11 @@ const envSchema = z.object({
     ),
   AGENT_TIMEOUT_MS: z.coerce.number().int().positive().default(10_000),
 
+  JWT_SECRET: z.string().min(16, 'JWT_SECRET must be at least 16 characters'),
+  JWT_EXPIRES_IN: z.string().default('7d'),
+
   META_GRAPH_VERSION: z.string().default('v26.0'),
+  META_APP_ID: z.string().default(''),
   META_ACCESS_TOKEN: z.string().default(''),
   META_PHONE_NUMBER_ID: z.string().default(''),
   META_WABA_ID: z.string().default(''),
